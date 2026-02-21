@@ -1,0 +1,14 @@
+flowchart LR
+  Client[Client (Frontend or API client)] -->|HTTP| FastAPI[FastAPI app.py]
+  FastAPI -->|calls| RAGService[RAGService]
+  RAGService --> Loader[PDF Loader]
+  Loader --> Splitter[Text Splitter]
+  Splitter --> VectorStore[Vector Store Builder]
+  VectorStore -->|embeddings| OpenAI[OpenAI Embeddings]
+  VectorStore -->|upsert/search| Pinecone[Pinecone Index]
+  RAGService --> Retriever[Retriever]
+  Retriever --> Pinecone
+  RAGService --> Generator[Answer Generator]
+  Generator --> OpenAIChat[OpenAI Chat]
+  Generator --> FastAPI
+  FastAPI --> Client
