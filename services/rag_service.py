@@ -50,19 +50,6 @@ def run_rag_pipeline_multi(queries: List[str], index_name: str) -> List[str]:
     return answers
 
 
-def index_pdf_in_pinecone(file_path: str, index_name: str) -> None:
-    """Load a PDF, split it, and index its chunks into a Pinecone vector store.
-
-    This is used when you just want to upload/index a document
-    without immediately asking a question.
-    """
-
-    document_text = load_pdf(file_path)
-    chunks = split_text(document_text)
-    # This call creates/updates the Pinecone index with the PDF chunks.
-    create_vector_store(chunks, index_name)
-
-
 class RAGService:
     """Simple service wrapper around the RAG pipeline."""
 
@@ -74,4 +61,13 @@ class RAGService:
         return run_rag_pipeline_multi(queries, index_name)
 
     def index_pdf(self, file_path: str, index_name: str) -> None:
-        index_pdf_in_pinecone(file_path, index_name)
+        """Load a PDF, split it, and index its chunks into a Pinecone vector store.
+
+        This is used when you just want to upload/index a document
+        without immediately asking a question.
+        """
+
+        document_text = load_pdf(file_path)
+        chunks = split_text(document_text)
+        # This call creates/updates the Pinecone index with the PDF chunks.
+        create_vector_store(chunks, index_name)
