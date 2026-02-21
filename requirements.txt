@@ -4,7 +4,7 @@ anyio==4.12.1
 certifi==2026.1.4
 charset-normalizer==3.4.4
 dotenv==0.9.9
-fastapi==0.129.0
+fastapi[standard]==0.129.0
 h11==0.16.0
 httpcore==1.0.9
 httpx==0.28.1
