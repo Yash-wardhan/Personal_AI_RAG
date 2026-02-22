@@ -4,6 +4,8 @@ import os
 from fastapi import FastAPI
 from core.config import PINECONE_INDEX_NAME
 from services.rag_service import RAGService
+from rag.agentic_rag import run_agentic_rag
+from pydantic import BaseModel
 
 app = FastAPI()
 rag_service = RAGService()
@@ -64,3 +66,19 @@ async def upload_pdf(file: UploadFile = File(...)):
         "file_path": file_location,
         "index_name": index_name,
     }
+
+
+class AgentQuery(BaseModel):
+    query: str
+
+
+@app.post("/agent-query/")
+async def agent_query(payload: AgentQuery):
+    """Run an agentic RAG query over the indexed resume.
+
+    This endpoint uses a LangGraph-based agent with a retrieval tool and
+    PII guardrails, instead of the simple one-shot RAG pipeline.
+    """
+
+    answer = run_agentic_rag(payload.query)
+    return {"answer": answer}
