@@ -146,6 +146,30 @@ Upload and index a PDF file.
 }
 ```
 
+### `POST /upload-url/`
+
+Fetch a candidate's public web page (e.g. LinkedIn profile, GitHub profile,
+personal portfolio) and index its text content into Pinecone.
+
+- Body (JSON):
+
+```json
+{ "url": "https://example.com/candidate-profile" }
+```
+
+**Response example:**
+
+```json
+{
+  "message": "Successfully fetched and indexed https://example.com/candidate-profile",
+  "url": "https://example.com/candidate-profile",
+  "index_name": "your_index_name"
+}
+```
+
+> After calling this endpoint, use `/process-pdf/` or `/agent-query/` to ask questions
+> about the indexed content.
+
 ### `POST /process-pdf/`
 
 Ask one or more questions about the indexed PDF.

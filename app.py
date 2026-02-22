@@ -37,7 +37,7 @@ async def process_pdf(queries: List[str]):
     return {"answers": answers}
 
 #UPLOAD PDF FILES TO THE SERVER
-from fastapi import File, UploadFile
+from fastapi import File, HTTPException, UploadFile
 
 
 @app.post("/upload-pdf/")
@@ -70,6 +70,36 @@ async def upload_pdf(file: UploadFile = File(...)):
 
 class AgentQuery(BaseModel):
     query: str
+
+
+class URLPayload(BaseModel):
+    url: str
+
+
+@app.post("/upload-url/")
+def upload_url(payload: URLPayload):
+    """Fetch a candidate URL and index its content into Pinecone.
+
+    Args:
+        payload: A JSON body containing the ``url`` field.
+    Returns:
+        A message confirming the URL was fetched and indexed.
+    Raises:
+        HTTPException 400: If the URL is invalid or points to a private address.
+        HTTPException 502: If the URL could not be fetched.
+    """
+    index_name = PINECONE_INDEX_NAME
+    try:
+        rag_service.index_url(payload.url, index_name)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    except RuntimeError as exc:
+        raise HTTPException(status_code=502, detail=str(exc)) from exc
+    return {
+        "message": f"Successfully fetched and indexed {payload.url}",
+        "url": payload.url,
+        "index_name": index_name,
+    }
 
 
 @app.post("/agent-query/")

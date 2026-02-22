@@ -1,6 +1,7 @@
 from typing import List
 
 from rag.loader import load_pdf
+from rag.url_loader import load_url
 from rag.splitter import split_text
 from rag.vector_store import create_vector_store, get_existing_vector_store
 from rag.retriever import search_relevant_data
@@ -59,6 +60,18 @@ class RAGService:
     def run_rag_pipeline_multi(self, queries: List[str], index_name: str) -> List[str]:
         # Use the existing Pinecone index; PDF only needed once at upload.
         return run_rag_pipeline_multi(queries, index_name)
+
+    def index_url(self, url: str, index_name: str) -> None:
+        """Fetch a web page, split its text, and index chunks into Pinecone.
+
+        Args:
+            url: The public URL to fetch (must be http:// or https://).
+            index_name: The Pinecone index to upsert the chunks into.
+        """
+
+        text = load_url(url)
+        chunks = split_text(text)
+        create_vector_store(chunks, index_name)
 
     def index_pdf(self, file_path: str, index_name: str) -> None:
         """Load a PDF, split it, and index its chunks into a Pinecone vector store.
